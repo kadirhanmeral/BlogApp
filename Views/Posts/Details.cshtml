@@ -1,0 +1,122 @@
+@model Post
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="bg-white p-4 rounded shadow-sm">
+            <h1 class="h4 mb-4">@Model.Title</h1>
+            <div class="tags mb-4">
+                @foreach(var tag in Model.Tags)
+                {
+                    <a href="/posts/tag/@tag.Url" class="badge bg-@tag.Color bg-opacity-10 text-@tag.Color mb-2 fw-bold">@tag.Text</a>
+                } 
+            </div>
+            <img src="~/img/@Model.Image" class="img-fluid rounded mb-4" alt="">
+            <ul class="list-inline">
+                <li class="list-inline-item"><i class="bi bi-calendar-fill"></i>@Model.PublishedOn.ToString("MMMM dd, yyyy")</li>
+                <li class="list-inline-item"><i class="bi bi-person-badge-fill"></i><a href="/profile/@Model.User.UserName">@Model.User.FullName</a></li>
+            </ul>
+            <hr class="py-3">
+            <div>@Html.Raw(@Model.Content)</div>            
+        </div>
+        <div class="bg-white mt-3 rounded shadow-sm">
+            <div class="card border-0">
+                <div class="card-header bg-white pb-0 border-bottom-0">
+                    <h4><span id="commentCount">@Model.Comments.Count()</span> Comments</h4>
+                </div>
+                <div class="card-body">
+                    <div id="comments">
+                        @foreach(var comment in Model.Comments)
+                        {
+                            <div class="my-4 d-flex">
+                                <img src="/img/@comment.User.Image" alt="" class="avatar rounded-circle me-3" style="width: 50px; height: 50px;">
+                                <div>
+                                    <div class="mb-2 d-flex align-items-center">
+                                        <h6 class="me-2 mb-0">
+                                            <a href="/profile/@comment.User.UserName">@comment.User.FullName</a>
+                                        </h6>
+                                        <small class="text-muted">@comment.PublishedOn.ToString("MMMM dd, yyyy")</small>
+                                    </div>
+                                    <p class="mb-1">@comment.Text</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <hr class="my-4">
+                    @if(User.Identity.IsAuthenticated)
+                    {
+                        <div>
+                            <h4 class="mb-3">Add Comment</h4>
+                            <form action="/posts/AddComment" method="post">
+                                <input type="hidden" id="PostId" name="PostId" value="@Model.PostId">
+                                <div class="mb-3">
+                                    <label for="Text" class="form-label">Comment</label>
+                                    <textarea type="text" name="Text" id="Text" rows="3" class="form-control"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <button id="saveComment" type="submit" class="btn btn-primary">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <a href="/users/login"> To add comment you must login.</a>
+                    }
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <vc:tags-menu></vc:tags-menu>
+        <vc:new-posts></vc:new-posts>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $("#saveComment").click(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("AddComment")',
+                    dataType: 'json',
+                    data: {
+                        PostId: $('#PostId').val(),
+                        UserName: $('#UserName').val(),
+                        Text: $('#Text').val(),
+                    },
+                    success: function(comment) {
+                        console.log(comment)
+                        var date = new Date(comment.publishedOn);
+
+                        $("#comments").append(`
+                            <div class="my-4 d-flex">
+                                <img src="/img/${comment.profilphoto}" alt="" class="avatar rounded-circle me-3" style="width: 50px; height: 50px;">
+                                <div>
+                                    <div class="mb-2 d-flex align-items-center">
+                                        <h6 class="me-2 mb-0">
+                                            <a href="/profile/${comment.username}">${comment.fullname}</a>
+                                        </h6>
+                                        <small class="text-muted">${date.toLocaleDateString()}</small>
+                                    </div>
+                                    <p class="mb-1">${comment.text}</p>
+                                </div>
+                            </div>
+                        `);
+
+                        $("#UserName").val('');
+                        $("#Text").val('');
+
+                        var count = parseInt($("#commentCount").text());
+                        $("#commentCount").text(count + 1);
+                    }
+                });
+
+                return false;
+            });
+        });
+    </script>
+}

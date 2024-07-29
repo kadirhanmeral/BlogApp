@@ -1,0 +1,47 @@
+@model PostViewModel
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="bg-white p-4 shadow-sm rounded">
+                <div class="d-flex">
+                    <a  asp-action="index"  type="button" class="btn btn-secondary h4 mb-4 ms-2 btn-custom">Popular Posts</a>
+                    
+                    @if(User.Identity!.IsAuthenticated)
+                    {
+                        <a  asp-contoller="Posts" asp-action="FollowingPosts"  type="button" class="btn btn-secondary h4 mb-4 ms-2 btn-custom">Following Posts</a>
+                    }
+                </div>
+
+                @foreach (var post in Model.Posts)
+                {
+                    <div class="card card-custom mb-4">
+                        <div class="row g-0">
+                            <div class="col-4">
+                                <a href="posts/details/@post.Url"><img src="~/img/@post.Image" class="img-fluid rounded fixed-size-img" alt=""></a>
+                                
+                            </div>
+                            <div class="col-8 p-3">
+                                <h5><a href="posts/details/@post.Url" class="fw-bold" style="color: #343a40;">@post.Title</a></h5>
+                                <p>@post.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-custom">
+                        <li class="page-item"><a href="#" class="page-link">1</a></li>
+                        <li class="page-item"><a href="#" class="page-link">2</a></li>
+                        <li class="page-item"><a href="#" class="page-link">3</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="sticky-top" style="top: 20px;">
+                <vc:tags-menu></vc:tags-menu>
+                <vc:new-posts class="mt-4"></vc:new-posts>
+            </div>
+        </div>
+    </div>
+</div>

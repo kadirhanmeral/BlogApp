@@ -1,0 +1,32 @@
+@model UserViewModel
+<form action="Edit" method="post" enctype="multipart/form-data">
+    <div class="row">
+
+        <h1 style="text-align: center;">Edit</h1>
+        <input type="hidden" asp-for="UserId">
+        <input type="hidden" asp-for="UserName">
+        <input type="hidden" asp-for="Image">
+
+
+            <div class="mb-3">
+                <img src="~/img/@Model.Image" style="width: 150px; z-index: 1"   class="img-fluid img-thumbnail mt-4 mb-2" alt="">
+                <input type="file" asp-for="ImageFile" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label  class="form-label">Username</label>
+                <input asp-for="UserName" class="form-control" disabled>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Fullname</label>
+                <input asp-for="FullName" class="form-control" disabled>
+            </div>  
+           
+
+            
+            <button type="submit" class="btn btn-primary">Save</button>
+ 
+
+    </div>
+</form>
+
+
